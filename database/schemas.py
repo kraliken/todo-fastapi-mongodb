@@ -1,0 +1,37 @@
+from datetime import datetime, timezone
+from enum import Enum
+from typing import Optional
+from pydantic import BaseModel, Field, ConfigDict
+
+from database.models import Priority, Status
+
+
+class CreateTodoSchema(BaseModel):
+    title: str = Field(..., min_length=3)
+    description: Optional[str] = Field(default=None, min_length=3)
+
+
+class UpdateTodoSchema(BaseModel):
+    title: Optional[str] = Field(None, min_length=3)
+    description: Optional[str] = Field(None, min_length=3)
+    status: Optional[Status] = None
+    priority: Optional[Priority] = None
+
+
+class ReadTodoSchema(BaseModel):
+    id: str = Field(validation_alias="_id")
+    title: str
+    description: Optional[str] = None
+    status: Status
+    priority: Priority
+    deadline: Optional[datetime] = None
+    archived: bool
+    created_at: datetime
+    updated_at: datetime
+
+    model_config = ConfigDict(populate_by_name=True)
+
+
+def doc_to_todo_out(doc: dict) -> dict:
+    doc["_id"] = str(doc["_id"])
+    return doc
