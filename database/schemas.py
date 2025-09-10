@@ -3,7 +3,7 @@ from enum import Enum
 from typing import Optional
 from pydantic import BaseModel, Field, ConfigDict
 
-from database.models import Priority, Status
+from database.models import Category, Priority, Status
 
 
 class CreateTodoSchema(BaseModel):
@@ -15,6 +15,7 @@ class UpdateTodoSchema(BaseModel):
     title: Optional[str] = Field(None, min_length=3)
     description: Optional[str] = Field(None, min_length=3)
     status: Optional[Status] = None
+    category: Optional[Category] = None
     priority: Optional[Priority] = None
 
 
@@ -23,11 +24,13 @@ class ReadTodoSchema(BaseModel):
     title: str
     description: Optional[str] = None
     status: Status
+    category: Category
     priority: Priority
     deadline: Optional[datetime] = None
     archived: bool
     created_at: datetime
     updated_at: datetime
+    completed_at: Optional[datetime] = None
 
     model_config = ConfigDict(populate_by_name=True)
 

@@ -1,13 +1,14 @@
 from typing import List
 from fastapi import APIRouter, HTTPException, Response, status
-from database.models import Priority, Status
+from database.models import Category, Priority, Status
+from database.db_config import collection
 from database.schemas import (
     CreateTodoSchema,
     ReadTodoSchema,
     UpdateTodoSchema,
     doc_to_todo_out,
 )
-from db_config import collection
+
 from bson.objectid import ObjectId
 from datetime import datetime, timezone
 from pymongo import ReturnDocument
@@ -18,7 +19,7 @@ router = APIRouter(prefix="/todos", tags=["todos"])
 
 @router.get("/", response_model=List[ReadTodoSchema], status_code=status.HTTP_200_OK)
 async def get_all_todos():
-    docs = collection.find({"is_deleted": False})
+    docs = collection.find({"archived": False})
     return [ReadTodoSchema(**doc_to_todo_out(d)) for d in docs]
 
 
@@ -30,12 +31,13 @@ async def create_todo(new_todo: CreateTodoSchema):
             "title": new_todo.title,
             "description": new_todo.description,
             "status": Status.backlog,  # default
+            "category": Category.work,  # default
             "priority": Priority.low,  # default
             "deadline": None,
             "archived": False,
             "created_at": now,  # default
             "updated_at": now,  # default
-            "is_deleted": False,
+            "completed_at": None,
         }
         result = collection.insert_one(doc)
         doc = collection.find_one({"_id": result.inserted_id})
@@ -73,7 +75,7 @@ async def update_todo(todo_id: str, payload: UpdateTodoSchema):
 
 
 @router.delete("/{todo_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_todo(todo_id: str):
+async def soft_delete_todo(todo_id: str):
     try:
         id = ObjectId(todo_id)
         existing_doc = collection.find_one({"_id": id})

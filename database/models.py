@@ -16,12 +16,19 @@ class Priority(str, Enum):
     high = "high"
 
 
+class Category(str, Enum):
+    work = "work"
+    personal = "personal"
+
+
 class Todo(BaseModel):
     title: str = Field(..., min_length=3)
     description: Optional[str] = Field(default=None, min_length=3)
     status: Status = Field(default=Status.backlog)
+    category: Category = Field(default=Category.work)
     priority: Priority = Field(default=Priority.low)
     deadline: Optional[datetime] = None
     archived: bool = Field(default=False)
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    completed_at: Optional[datetime] = None
