@@ -26,7 +26,7 @@ class Todo(BaseModel):
     description: Optional[str] = Field(default=None, min_length=3)
     status: Status = Field(default=Status.backlog)
     category: Category = Field(default=Category.work)
-    deadline: Optional[datetime] = None
+    deadline: datetime
     time_spent: Optional[timedelta] = Field(default=None)
     priority: Priority = Field(default=Priority.low)
     archived: bool = Field(default=False)

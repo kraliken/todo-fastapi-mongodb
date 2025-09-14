@@ -10,7 +10,7 @@ class CreateTodoSchema(BaseModel):
     title: str = Field(..., min_length=3)
     description: Optional[str] = Field(default=None, min_length=3)
     category: Optional[Category] = None
-    deadline: Optional[datetime] = None
+    deadline: datetime
     priority: Optional[Priority] = None
 
 

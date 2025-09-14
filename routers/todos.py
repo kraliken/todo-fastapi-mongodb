@@ -32,7 +32,7 @@ async def create_todo(new_todo: CreateTodoSchema):
             "description": new_todo.description,
             "status": Status.backlog,  # default
             "category": new_todo.category or Category.work,  # default
-            "deadline": new_todo.deadline or None,
+            "deadline": new_todo.deadline or now,
             "time_spent": None,
             "priority": new_todo.priority or Priority.low,  # default
             "archived": False,
