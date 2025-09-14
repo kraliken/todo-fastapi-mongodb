@@ -31,9 +31,10 @@ async def create_todo(new_todo: CreateTodoSchema):
             "title": new_todo.title,
             "description": new_todo.description,
             "status": Status.backlog,  # default
-            "category": Category.work,  # default
-            "priority": Priority.low,  # default
-            "deadline": None,
+            "category": new_todo.category or Category.work,  # default
+            "deadline": new_todo.deadline or None,
+            "time_spent": None,
+            "priority": new_todo.priority or Priority.low,  # default
             "archived": False,
             "created_at": now,  # default
             "updated_at": now,  # default
@@ -60,6 +61,10 @@ async def update_todo(todo_id: str, payload: UpdateTodoSchema):
             )
 
         update_doc = payload.model_dump(exclude_unset=True)
+
+        if "time_spent" in update_doc and update_doc["time_spent"] is not None:
+            update_doc["time_spent"] = int(update_doc["time_spent"].total_seconds())
+
         update_doc["updated_at"] = datetime.now(timezone.utc)
 
         updated = collection.find_one_and_update(
@@ -71,7 +76,7 @@ async def update_todo(todo_id: str, payload: UpdateTodoSchema):
         return ReadTodoSchema(**doc_to_todo_out(updated))
 
     except Exception as e:
-        return HTTPException(status_code=500, detail=f"Some error occured {e}")
+        raise HTTPException(status_code=500, detail=f"Some error occured {e}")
 
 
 @router.delete("/{todo_id}", status_code=status.HTTP_204_NO_CONTENT)
