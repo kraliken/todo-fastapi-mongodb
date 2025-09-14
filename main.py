@@ -22,6 +22,7 @@ origins = [
     "http://localhost",
     "http://localhost:3000",
     "http://localhost:8000",
+    "https://todo-kraliken.azurewebsites.net",
 ]
 
 app.add_middleware(
