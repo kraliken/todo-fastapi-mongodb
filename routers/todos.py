@@ -23,7 +23,9 @@ async def get_all_todos():
     return [ReadTodoSchema(**doc_to_todo_out(d)) for d in docs]
 
 
-@router.post("/", response_model=ReadTodoSchema, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/create", response_model=ReadTodoSchema, status_code=status.HTTP_201_CREATED
+)
 async def create_todo(new_todo: CreateTodoSchema):
     try:
         now = datetime.now(timezone.utc)
@@ -37,13 +39,11 @@ async def create_todo(new_todo: CreateTodoSchema):
             "priority": new_todo.priority or Priority.low,  # default
             "archived": False,
             "created_at": now,  # default
-            "updated_at": now,  # default
+            "updated_at": None,  # default
             "completed_at": None,
         }
         result = collection.insert_one(doc)
         doc = collection.find_one({"_id": result.inserted_id})
-
-        print(doc)
 
         return ReadTodoSchema(**doc_to_todo_out(doc))
     except Exception as e:

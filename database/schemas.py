@@ -30,12 +30,12 @@ class ReadTodoSchema(BaseModel):
     description: Optional[str] = None
     status: Status
     category: Category
-    deadline: Optional[datetime] = None
+    deadline: datetime
     time_spent: Optional[timedelta] = None
     priority: Priority
     archived: bool
     created_at: datetime
-    updated_at: datetime
+    updated_at: Optional[datetime] = None
     completed_at: Optional[datetime] = None
 
     model_config = ConfigDict(populate_by_name=True)
